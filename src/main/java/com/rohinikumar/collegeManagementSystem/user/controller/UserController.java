@@ -66,4 +66,18 @@ public class UserController {
     public List<UserResponse> getAllActiveUsers() {
         return userService.getAllActiveUsers();
     }
+
+
+    @GetMapping("/pagination")
+    public UserPageResponse getUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(required = false) String search
+    ) {
+        return userService.getUsers(
+                page,
+                size,
+                search
+        );
+    }
 }
