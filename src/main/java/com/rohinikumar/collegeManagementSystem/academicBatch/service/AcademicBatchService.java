@@ -7,6 +7,8 @@ import com.rohinikumar.collegeManagementSystem.academicBatch.dto.response.Academ
 import com.rohinikumar.collegeManagementSystem.academicBatch.entity.AcademicBatchEntity;
 import com.rohinikumar.collegeManagementSystem.academicBatch.enums.AcademicYearStatus;
 import com.rohinikumar.collegeManagementSystem.academicBatch.repository.AcademicBatchRepository;
+import com.rohinikumar.collegeManagementSystem.department.entity.DepartmentEntity;
+import com.rohinikumar.collegeManagementSystem.department.enums.DepartmentStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -30,8 +32,9 @@ public class AcademicBatchService {
 
 
     public List<AcademicBatchResponse> getAllAcademicBatch(){
-        return academicBatchRepository.findAll().
-                stream().map(this::mapToResponse).toList();
+
+        List<AcademicBatchEntity> academicBatchList = academicBatchRepository.findAllByStatus(AcademicYearStatus.ACTIVE);
+        return academicBatchList.stream().map(this::mapToResponse).toList();
     }
 
 
@@ -72,7 +75,7 @@ public class AcademicBatchService {
                 .endYear(academicBatchEntity.getEndYear())
                 .startYear(academicBatchEntity.getStartYear())
                 .status(academicBatchEntity.getStatus())
-                .status(academicBatchEntity.getStatus())
+                .name(academicBatchEntity.getName())
                 .build();
     }
     
