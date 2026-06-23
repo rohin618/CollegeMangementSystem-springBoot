@@ -75,6 +75,15 @@ public class SubjectService {
 
     }
 
+    public List<SubjectResponse> getAllSubjects() {
+
+        return subjectRepository
+                .findAllByStatus(SubjectStatus.ACTIVE)
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
 
     @Transactional
     public SubjectResponse updateSubject(Long id, UpdateSubject updateSubject){

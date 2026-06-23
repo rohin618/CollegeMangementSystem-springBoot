@@ -12,7 +12,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Table(name = "academicBatch")
+@Table(name = "academic_batch")
 public class AcademicBatchEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

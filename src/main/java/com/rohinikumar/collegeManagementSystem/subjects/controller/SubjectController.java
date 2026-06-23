@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/subjects")
 @RequiredArgsConstructor
@@ -36,6 +38,10 @@ public class SubjectController {
                 size,
                 search
         );
+    }
+    @GetMapping
+    public List<SubjectResponse> getAllSubjects() {
+        return subjectService.getAllSubjects();
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")

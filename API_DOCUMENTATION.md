@@ -635,3 +635,450 @@ DELETE /api/subjects/{id}
 ```
 
 ---
+
+
+# CURRICULUM APIs
+
+## 25. Create Curriculum
+
+### URL
+
+```http
+POST /api/curriculum
+```
+
+### Request
+
+```json
+{
+  "departmentId": 1,
+  "academicBatchId": 1,
+  "semesterId": 3,
+  "subjectIds": [1, 2, 3, 4]
+}
+```
+
+### Response
+
+```json
+"Curriculum created successfully"
+```
+
+---
+
+## 26. Get Curriculum List
+
+### URL
+
+```http
+GET /api/curriculum
+```
+
+### Response
+
+```json
+[
+  {
+    "id": 1,
+    "departmentId": 1,
+    "departmentName": "CSE",
+    "academicBatchId": 1,
+    "academicBatchName": "2025-2029",
+    "semesterId": 3,
+    "semesterName": "Semester 3",
+    "subjectId": 1,
+    "subjectName": "Java Programming",
+    "displayOrder": 1,
+    "status": "ACTIVE"
+  }
+]
+```
+
+---
+
+## 27. Get Curriculum With Pagination
+
+### URL
+
+```http
+GET /api/curriculum/pagination?page=0&size=10
+```
+
+### Response
+
+```json
+{
+  "content": [
+    {
+      "id": 1,
+      "departmentId": 1,
+      "departmentName": "CSE",
+      "academicBatchId": 1,
+      "academicBatchName": "2025-2029",
+      "semesterId": 3,
+      "semesterName": "Semester 3",
+      "subjectId": 1,
+      "subjectName": "Java Programming",
+      "displayOrder": 1,
+      "status": "ACTIVE"
+    }
+  ],
+  "pageNumber": 0,
+  "pageSize": 10,
+  "totalElements": 25,
+  "totalPages": 3,
+  "last": false
+}
+```
+
+---
+
+## 28. Update Curriculum
+
+### URL
+
+```http
+PUT /api/curriculum/{id}
+```
+
+### Request
+
+```json
+{
+  "displayOrder": 2,
+  "status": "ACTIVE"
+}
+```
+
+### Response
+
+```json
+{
+  "id": 1,
+  "departmentId": 1,
+  "departmentName": "CSE",
+  "academicBatchId": 1,
+  "academicBatchName": "2025-2029",
+  "semesterId": 3,
+  "semesterName": "Semester 3",
+  "subjectId": 1,
+  "subjectName": "Java Programming",
+  "displayOrder": 2,
+  "status": "ACTIVE"
+}
+```
+
+---
+
+## 29. Delete Curriculum
+
+### URL
+
+```http
+DELETE /api/curriculum/{id}
+```
+
+### Response
+
+```json
+"Curriculum deleted successfully"
+```
+# Curriculum Module
+
+## Overview
+
+The Curriculum module manages the mapping between:
+
+* Department
+* Academic Batch
+* Semester
+* Subject
+
+A curriculum record defines which subjects belong to a particular department, batch, and semester.
+
+---
+
+## Database Design
+
+### CurriculumEntity
+
+| Field         | Type                | Description            |
+| ------------- | ------------------- | ---------------------- |
+| id            | Long                | Primary Key            |
+| department    | DepartmentEntity    | Department Mapping     |
+| academicBatch | AcademicBatchEntity | Academic Batch Mapping |
+| semester      | SemesterEntity      | Semester Mapping       |
+| subject       | SubjectEntity       | Subject Mapping        |
+| displayOrder  | Integer             | Subject Display Order  |
+| status        | CurriculumStatus    | ACTIVE / INACTIVE      |
+
+---
+
+## Relationships
+
+```text
+Department
+    |
+    +---- Curriculum ---- Subject
+    |
+Academic Batch
+    |
+Semester
+```
+
+---
+
+## Features Implemented
+
+### Create Curriculum
+
+Endpoint:
+
+```http
+POST /api/curriculum
+```
+
+Request:
+
+```json
+{
+  "departmentId": 1,
+  "academicBatchId": 1,
+  "semesterId": 1,
+  "subjectIds": [1,2,3,4]
+}
+```
+
+Validation:
+
+* Department must exist
+* Academic Batch must exist
+* Semester must exist
+* Subject must exist
+* Duplicate curriculum mapping not allowed
+
+Response:
+
+```json
+[
+  {
+    "id": 1,
+    "departmentName": "CSE",
+    "semesterName": "Semester 1",
+    "subjectName": "Java"
+  }
+]
+```
+
+---
+
+### Get Curriculum
+
+Endpoint:
+
+```http
+GET /api/curriculum
+```
+
+Filters:
+
+```http
+GET /api/curriculum
+    ?departmentId=1
+    &academicBatchId=1
+    &semesterId=1
+    &page=0
+    &size=10
+```
+
+Features:
+
+* Pagination
+* Department Filter
+* Academic Batch Filter
+* Semester Filter
+
+---
+
+### Update Curriculum
+
+Endpoint:
+
+```http
+PUT /api/curriculum
+```
+
+Request:
+
+```json
+{
+  "id": 1,
+  "departmentId": 1,
+  "academicBatchId": 1,
+  "semesterId": 1,
+  "subjectId": 5
+}
+```
+
+Validation:
+
+* Curriculum exists
+* Department exists
+* Academic Batch exists
+* Semester exists
+* Subject exists
+* Duplicate mapping check
+
+Response:
+
+```json
+{
+  "id": 1,
+  "departmentName": "CSE",
+  "semesterName": "Semester 1",
+  "subjectName": "DBMS"
+}
+```
+
+---
+
+### Delete Curriculum
+
+Endpoint:
+
+```http
+DELETE /api/curriculum/{id}
+```
+
+Behavior:
+
+* Soft Delete
+* Status changed from ACTIVE to INACTIVE
+
+Response:
+
+```json
+{
+  "message": "Curriculum deleted successfully"
+}
+```
+
+---
+
+## Business Rules
+
+### Create
+
+A subject cannot be mapped twice for the same:
+
+* Department
+* Academic Batch
+* Semester
+
+Example:
+
+```text
+CSE + 2025 Batch + Semester 1 + Java
+```
+
+Duplicate creation is not allowed.
+
+---
+
+### Update
+
+Before update, verify that the new combination:
+
+```text
+Department + Academic Batch + Semester + Subject
+```
+
+does not already exist.
+
+If it exists:
+
+```text
+Curriculum mapping already exists
+```
+
+---
+
+## Status Flow
+
+```text
+ACTIVE
+   |
+   +----> INACTIVE
+```
+
+No physical deletion is performed.
+
+---
+
+## Frontend Features
+
+### Curriculum List
+
+* Infinite Pagination
+* Edit Curriculum
+* Delete Curriculum
+
+### Curriculum Form
+
+Create Mode:
+
+* Department Selection
+* Academic Batch Selection
+* Semester Selection
+* Multiple Subject Selection
+
+Edit Mode:
+
+* Single Subject Selection
+* Replace existing subject
+
+### Validation
+
+* Required Fields
+* Duplicate Subject Prevention
+* API Error Handling
+
+---
+
+## Repository Methods
+
+### Create Validation
+
+```java
+existsByDepartmentAndAcademicBatchAndSemesterAndSubjectAndStatus(...)
+```
+
+### Update Validation
+
+```java
+existsByDepartmentAndAcademicBatchAndSemesterAndSubjectAndStatusAndIdNot(...)
+```
+
+### List
+
+```java
+
+```
+
+---
+
+## Module Status
+
+```text
+Curriculum Module : COMPLETED
+```
+
+Implemented:
+✓ Create
+✓ List
+✓ Filters
+✓ Update
+✓ Soft Delete
+✓ Validation
+✓ Frontend Integration
+✓ Pagination

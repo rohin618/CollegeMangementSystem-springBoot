@@ -7,6 +7,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.List;
+
 public interface SubjectRepository extends JpaRepository<SubjectEntity,Long> {
     Page<SubjectEntity> findByStatusAndNameContainingIgnoreCaseOrStatusAndCodeContainingIgnoreCase(
             SubjectStatus status1,
@@ -19,4 +21,6 @@ public interface SubjectRepository extends JpaRepository<SubjectEntity,Long> {
             SubjectStatus status,
             Pageable pageable
     );
+
+    List<SubjectEntity> findAllByStatus(SubjectStatus status);
 }
